@@ -1,0 +1,28 @@
+version: 1
+build:
+  steps:
+    - type: docker-build
+      name: image
+      context: .
+      dockerfile: Dockerfile
+      image: versionark-demo:${CRS_VERSION}
+artifact:
+  kind: docker-image
+  deployment:
+    target_type: docker-compose
+    entrypoint: docker-compose.release.yml
+  include:
+    - docker-compose.release.yml
+  health:
+    path: /healthz
+  # 代码里每读一个环境变量，就在这里登记一条。
+  config:
+    - name: APP_MODE
+      description: 运行模式，会显示在首页
+      example: test
+      required: true
+    - name: SECRET_KEY
+      description: 会话签名密钥（首页只显示是否已设置）
+      secret: true
+      generate: true
+      required: true

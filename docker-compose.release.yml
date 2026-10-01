@@ -1,0 +1,15 @@
+# 运行态 Compose：只能用 image，不能有 build；端口由平台分配（CRS_PORT 写在同目录的 .env 里）。
+# 端口对外是否可达由云服务器安全组决定，默认不放行。
+services:
+  web:
+    image: versionark-demo:${CRS_VERSION}
+    env_file: .env
+    environment:
+      PORT: "8000"
+    ports:
+      - "${CRS_PORT}:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)"]
+      interval: 5s
+      retries: 6
